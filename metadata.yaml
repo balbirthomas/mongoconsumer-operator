@@ -2,9 +2,15 @@
 # See LICENSE file for licensing details.
 name: mongoconsumer
 description: |
-  TODO: fill out the charm's description
+        A Charm to test MongoDB charm libraries.
 summary: |
-  TODO: fill out the charm's summary
+        This charm may be used as a functional test
+        harness for MongoDB charm libraries, by
+        creating a database consumer relation with
+        the MongoDB charm.
 series: [kubernetes]
-
-
+resources:
+  busybox-image:
+    type: oci-image
+    description: upstream docker image for busybox
+    upstream-source: 'busybox:latest'
