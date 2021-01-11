@@ -16,7 +16,7 @@ from ops.model import (
 )
 
 from oci_image import OCIImageResource, OCIImageResourceError
-
+from mongoclient import MongoConsumer
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,10 @@ class MongoconsumerCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.mongodb = MongoConsumer(self, 'database')
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
+        self.framework.observe(self.mongodb.on.db_available, self.on_db_available)
         self._stored.set_default(events=[])
 
     def on_stop(self, _):
@@ -47,6 +49,9 @@ class MongoconsumerCharm(CharmBase):
             return
 
         self.configure_pod()
+
+    def on_db_available(self, event):
+        logger.debug("GOTDB: " + str(event.config))
 
     def configure_pod(self):
         logger.debug(str(sorted(os.environ.items())))
