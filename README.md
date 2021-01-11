@@ -13,7 +13,10 @@ Install the charmcraft tool
 
     sudo snap install charmcraft
 
-Build the charm in this git repository
+First copy the `mongoclient.py` (charm library) file from the
+`mongodb-operator` repository into the source (`src`) directory.
+
+Then build the charm in this git repository
 
     charmcraft build
 
@@ -25,7 +28,7 @@ Create a Juju model for your operators, say "lma"
 
 Deploy a single unit of MongoDB using its default configuration
 
-    juju deploy ./mongoconsumer.charm
+    juju deploy ./mongoconsumer.charm --resource busybox-image='busybox:latest'
 
 ## Developing
 
