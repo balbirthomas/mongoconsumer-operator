@@ -8,3 +8,7 @@ options:
     default: true
     description: Should charm record all events it receives
     type: boolean
+  consumes:
+    default: "mongodb, >4.0.0"
+    description: Type and version of database required by this charm
+    type: string
