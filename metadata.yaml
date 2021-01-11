@@ -9,6 +9,9 @@ summary: |
         creating a database consumer relation with
         the MongoDB charm.
 series: [kubernetes]
+requires:
+  database:
+    interface: mongodb
 resources:
   busybox-image:
     type: oci-image
