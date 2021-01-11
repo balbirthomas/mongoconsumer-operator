@@ -26,7 +26,8 @@ class MongoconsumerCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.mongodb = MongoConsumer(self, 'database')
+        self.mongodb = MongoConsumer(self, 'database',
+                                     [self.model.config['consumes'].split(',')])
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.mongodb.on.db_available, self.on_db_available)
