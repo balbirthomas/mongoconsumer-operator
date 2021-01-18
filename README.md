@@ -13,8 +13,8 @@ Install the charmcraft tool
 
     sudo snap install charmcraft
 
-First copy the `mongoclient.py` (charm library) file from the
-`mongodb-operator` repository into the source (`src`) directory.
+First copy the `mongoclient.py` and `relation.py` (charm libraries) file from
+the `mongodb-operator` repository into the source (`src`) directory.
 
 Then build the charm in this git repository
 
