@@ -31,6 +31,7 @@ class MongoconsumerCharm(CharmBase):
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.mongodb.on.db_available, self.on_db_available)
+        self.framework.observe(self.mongodb.on.provider_invalid, self.on_provider_invalid)
         self._stored.set_default(events=[])
 
     def on_stop(self, _):
@@ -53,6 +54,9 @@ class MongoconsumerCharm(CharmBase):
 
     def on_db_available(self, event):
         logger.debug("GOTDB: " + str(event.config))
+
+    def on_provider_invalid(self, _):
+        logger.debug("FAILEDDB")
 
     def configure_pod(self):
         logger.debug(str(sorted(os.environ.items())))
