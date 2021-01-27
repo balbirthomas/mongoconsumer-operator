@@ -16,7 +16,7 @@ from ops.model import (
 )
 
 from oci_image import OCIImageResource, OCIImageResourceError
-from mongoclient import MongoConsumer
+from relation import ConsumerBase
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +26,11 @@ class MongoconsumerCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.mongodb = MongoConsumer(self, 'database',
-                                     self.model.config['consumes'])
+        self.mongodb = ConsumerBase(self, 'database',
+                                    self.model.config['consumes'])
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
-        self.framework.observe(self.mongodb.on.db_available, self.on_db_available)
+        self.framework.observe(self.mongodb.on.available, self.on_db_available)
         self.framework.observe(self.mongodb.on.invalid, self.on_provider_invalid)
         self.framework.observe(self.mongodb.on.departed, self.on_provider_departed)
         self._stored.set_default(events=[])
@@ -54,7 +54,7 @@ class MongoconsumerCharm(CharmBase):
         self.configure_pod()
 
     def on_db_available(self, event):
-        logger.debug("GOTDB: " + str(event.config))
+        logger.debug("GOTDB: " + str(event.data['config']))
 
     def on_provider_invalid(self, _):
         logger.debug("FAILEDDB")
