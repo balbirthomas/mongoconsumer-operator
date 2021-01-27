@@ -31,8 +31,8 @@ class MongoconsumerCharm(CharmBase):
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.mongodb.on.db_available, self.on_db_available)
-        self.framework.observe(self.mongodb.on.provider_invalid, self.on_provider_invalid)
-        self.framework.observe(self.mongodb.on.provider_departed, self.on_provider_departed)
+        self.framework.observe(self.mongodb.on.invalid, self.on_provider_invalid)
+        self.framework.observe(self.mongodb.on.departed, self.on_provider_departed)
         self._stored.set_default(events=[])
 
     def on_stop(self, _):
