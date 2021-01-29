@@ -16,7 +16,7 @@ from ops.model import (
 )
 
 from oci_image import OCIImageResource, OCIImageResourceError
-from relation import ConsumerBase
+from relation import Consumer
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,8 @@ class MongoconsumerCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.mongodb = ConsumerBase(self, 'database',
-                                    self.consumes)
+        self.mongodb = Consumer(self, 'database',
+                                self.consumes)
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.mongodb.on.available, self.on_db_available)
