@@ -27,7 +27,7 @@ class MongoconsumerCharm(CharmBase):
     def __init__(self, *args):
         super().__init__(*args)
         self.mongodb = ConsumerBase(self, 'database',
-                                    self.model.config['consumes'])
+                                    self.consumes)
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.mongodb.on.available, self.on_db_available)
@@ -97,6 +97,9 @@ class MongoconsumerCharm(CharmBase):
         if self.unit.is_leader():
             self.model.pod.set_spec(pod_spec)
             self.unit.status = ActiveStatus()
+
+    def consumes(self):
+        return self.model.config['consumes']
 
 
 if __name__ == "__main__":
