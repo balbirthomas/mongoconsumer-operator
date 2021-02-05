@@ -16,7 +16,7 @@ from ops.model import (
 )
 
 from oci_image import OCIImageResource, OCIImageResourceError
-from relation import Consumer
+from ops.relation import Consumer
 
 logger = logging.getLogger(__name__)
 
