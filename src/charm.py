@@ -3,6 +3,7 @@
 # See LICENSE file for licensing details.
 
 import os
+import json
 import logging
 
 from ops.charm import CharmBase
@@ -99,7 +100,7 @@ class MongoconsumerCharm(CharmBase):
             self.unit.status = ActiveStatus()
 
     def consumes(self):
-        return self.model.config['consumes']
+        return json.loads(self.model.config['consumes'])
 
 
 if __name__ == "__main__":
