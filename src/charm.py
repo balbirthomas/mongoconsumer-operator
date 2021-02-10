@@ -99,6 +99,7 @@ class MongoconsumerCharm(CharmBase):
             self.model.pod.set_spec(pod_spec)
             self.unit.status = ActiveStatus()
 
+    @property
     def consumes(self):
         return json.loads(self.model.config['consumes'])
 
