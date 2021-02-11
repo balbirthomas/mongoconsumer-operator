@@ -33,7 +33,7 @@ class MongoconsumerCharm(CharmBase):
         self.framework.observe(self.on.config_changed, self.on_config_changed)
         self.framework.observe(self.mongodb.on.available, self.on_db_available)
         self.framework.observe(self.mongodb.on.invalid, self.on_provider_invalid)
-        self.framework.observe(self.mongodb.on.departed, self.on_provider_departed)
+        self.framework.observe(self.mongodb.on.broken, self.on_provider_broken)
         self._stored.set_default(events=[])
 
     def on_stop(self, _):
@@ -60,7 +60,7 @@ class MongoconsumerCharm(CharmBase):
     def on_provider_invalid(self, _):
         logger.debug("FAILEDDB")
 
-    def on_provider_departed(self, _):
+    def on_provider_broken(self, _):
         logger.debug("LOSTDB")
 
     def configure_pod(self):
