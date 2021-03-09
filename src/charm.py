@@ -17,7 +17,7 @@ from ops.model import (
 )
 
 from oci_image import OCIImageResource, OCIImageResourceError
-from ops.relation import Consumer
+from charms.mongodb.v1.mongodb import MongoConsumer
 
 logger = logging.getLogger(__name__)
 
@@ -27,14 +27,16 @@ class MongoconsumerCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self.mongodb = Consumer(self, 'database',
-                                self.consumes)
+        self.mongo_consumer = MongoConsumer(self, 'database',
+                                            self.consumes)
         self.image = OCIImageResource(self, "busybox-image")
         self.framework.observe(self.on.config_changed, self.on_config_changed)
-        self.framework.observe(self.mongodb.on.available, self.on_db_available)
-        self.framework.observe(self.mongodb.on.invalid, self.on_provider_invalid)
-        self.framework.observe(self.mongodb.on.broken, self.on_provider_broken)
+        self.framework.observe(self.mongo_consumer.on.available, self.on_db_available)
+        self.framework.observe(self.mongo_consumer.on.invalid, self.on_provider_invalid)
+        self.framework.observe(self.mongo_consumer.on.broken, self.on_provider_broken)
         self._stored.set_default(events=[])
+        self._stored.set_default(num_dbs=2)
+        self._stored.set_default(requested_dbs=0)
 
     def on_stop(self, _):
         """Mark terminating unit as inactive
@@ -55,7 +57,14 @@ class MongoconsumerCharm(CharmBase):
         self.configure_pod()
 
     def on_db_available(self, event):
-        logger.debug("GOTDB: " + str(event.data['config']))
+        logger.debug("DBCONFIG: " + str(event.data['config']))
+        logger.debug("GOTDBS: " + str(self.mongo_consumer.databases()))
+        if self._stored.requested_dbs < self._stored.num_dbs:
+            num_dbs = self._stored.num_dbs - self._stored.requested_dbs
+            logger.debug("CLIENT REQUESTING: {} dbs".format(num_dbs))
+            for i in range(num_dbs):
+                self.mongo_consumer.new_database()
+                self._stored.requested_dbs += 1
 
     def on_provider_invalid(self, _):
         logger.debug("FAILEDDB")
