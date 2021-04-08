@@ -5,6 +5,7 @@
 import os
 import json
 import logging
+import pymongo
 
 from ops.charm import CharmBase
 from ops.main import main
@@ -57,20 +58,41 @@ class MongoconsumerCharm(CharmBase):
         self.configure_pod()
 
     def on_db_available(self, event):
-        logger.debug("DBCONFIG: " + str(event.data['config']))
-        logger.debug("GOTDBS: " + str(self.mongo_consumer.databases()))
+        if self.model.config['record_events']:
+            self._stored.events.append("db_available")
+
+        logger.debug("Got Databases: " + str(self.mongo_consumer.databases()))
         if self._stored.requested_dbs < self._stored.num_dbs:
             num_dbs = self._stored.num_dbs - self._stored.requested_dbs
-            logger.debug("CLIENT REQUESTING: {} dbs".format(num_dbs))
+            logger.debug("Requesting additional {} databases".format(num_dbs))
             for i in range(num_dbs):
                 self.mongo_consumer.new_database()
                 self._stored.requested_dbs += 1
+        else:
+            self.test_databases()
 
     def on_provider_invalid(self, _):
-        logger.debug("FAILEDDB")
+        if self.model.config['record_events']:
+            self._stored.events.append("provider_invalid")
+
+        logger.debug("Failed to get a valid provider")
 
     def on_provider_broken(self, _):
-        logger.debug("LOSTDB")
+        logger.debug("Database provider relation broken")
+
+    def test_databases(self):
+        for id in self.mongo_consumer.provider_ids():
+            creds = self.mongo_consumer.credentials(id)
+            uri = creds['replica_set_uri']
+            client = pymongo.MongoReplicaSetClient(uri)
+            for dbname in self.mongo_consumer.databases(id):
+                post = {"test": "A test post"}
+                logger.debug("writing {} to {}".format(post, dbname))
+                db = client[dbname]
+                tbl = db["test"]
+                tbl.insert_one(post)
+                posts = list(tbl.find())
+                logger.debug("read {} from {}".format(posts, dbname))
 
     def configure_pod(self):
         logger.debug(str(sorted(os.environ.items())))
@@ -93,7 +115,7 @@ class MongoconsumerCharm(CharmBase):
                     "name": self.app.name,
                     "imageDetails": image_info,
                     "command": ["sh"],
-                    "args": ["-c", "while true; do env && date; sleep 5;done"],
+                    "args": ["-c", "while true; do date; sleep 60;done"],
                     "imagePullPolicy": "Always",
                     "ports": [{
                         "name": self.app.name,
