@@ -84,7 +84,7 @@ class MongoconsumerCharm(CharmBase):
         for id in self.mongo_consumer.provider_ids():
             creds = self.mongo_consumer.credentials(id)
             uri = creds['replica_set_uri']
-            client = pymongo.MongoReplicaSetClient(uri)
+            client = pymongo.MongoClient(uri)
             for dbname in self.mongo_consumer.databases(id):
                 post = {"test": "A test post"}
                 logger.debug("writing {} to {}".format(post, dbname))
