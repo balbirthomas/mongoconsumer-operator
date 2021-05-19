@@ -1,12 +1,12 @@
 import json
 import uuid
-from ops.relation import Consumer
+from ops.relation import ConsumerBase
 
 LIBAPI = 1
 LIBPATCH = 0
 
 
-class MongoConsumer(Consumer):
+class MongoConsumer(ConsumerBase):
     def __init__(self, charm, name, consumes, multi=False):
         super().__init__(charm, name, consumes, multi)
         self.charm = charm
@@ -31,12 +31,7 @@ class MongoConsumer(Consumer):
             if available, otherwise an empty dictionary is returned.
         """
 
-        if rel_id:
-            rel = self.framework.model.get_relation(self.relation_name, rel_id)
-        else:
-            # will raise TooManyRelatedAppsError if used in multi mode
-            rel = self.framework.model.get_relation(self.relation_name)
-
+        rel = self.framework.model.get_relation(self.relation_name, rel_id)
         relation_data = rel.data[rel.app]
         username = relation_data.get('username')
         password = relation_data.get('password')
@@ -67,12 +62,7 @@ class MongoConsumer(Consumer):
         Returns:
             list: list of database names
         """
-        if rel_id:
-            rel = self.framework.model.get_relation(self.relation_name, rel_id)
-        else:
-            # will raise TooManyRelatedAppsError if used in multi mode
-            rel = self.framework.model.get_relation(self.relation_name)
-
+        rel = self.framework.model.get_relation(self.relation_name, rel_id)
         relation_data = rel.data[rel.app]
         dbs = relation_data.get('databases')
         databases = json.loads(dbs) if dbs else []
@@ -95,11 +85,7 @@ class MongoConsumer(Consumer):
         if not self.charm.unit.is_leader():
             return
 
-        if rel_id:
-            rel = self.framework.model.get_relation(self.relation_name, rel_id)
-        else:
-            # will raise TooManyRelatedAppsError if used in multi mode
-            rel = self.framework.model.get_relation(self.relation_name)
+        rel = self.framework.model.get_relation(self.relation_name, rel_id)
 
         id = uuid.uuid4()
         db_name = "db-{}-{}".format(rel.id, id)
