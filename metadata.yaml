@@ -11,7 +11,7 @@ summary: |
 series: [kubernetes]
 requires:
   database:
-    interface: mongodb
+    interface: mongodb_datastore
 resources:
   busybox-image:
     type: oci-image
